@@ -1,6 +1,6 @@
 import { useState } from "react";
 import reactLogo from "@/assets/react.svg";
-import wxtLogo from "/wxt.svg";
+import Logo from "/logo.svg";
 import "./App.css";
 import { Button } from "@arco-design/web-react";
 function App() {
