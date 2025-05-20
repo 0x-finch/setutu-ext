@@ -15,6 +15,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@arco-design/web-react": "^2.66.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
