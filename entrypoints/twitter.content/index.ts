@@ -1,3 +1,8 @@
+import "./twitter.css";
+
+// const apiUrl = "https://www.setutu.vip/server/v1"
+const apiUrl = "http://localhost:9000/v1";
+
 export default defineContentScript({
   matches: ["*://*.twitter.com/*", "*://x.com/*"],
   main: (ctx) => {
@@ -10,28 +15,19 @@ export default defineContentScript({
 
     const createSaveButton = (
       tweetElement: HTMLElement,
-      imageUrl: string,
-      max: number
+      imageUrls: string[]
     ) => {
-      const existingButtons = tweetElement.querySelectorAll(
+      const existingButton = tweetElement.querySelector(
         ".setutu-save-image-button"
       );
 
-      if (existingButtons.length >= max) {
+      if (existingButton) {
         return;
       }
 
       const button = document.createElement("button");
       button.textContent = "Save Image";
-      button.className = "setutu-save-image-button"; // Your unique class name
-      button.style.marginLeft = "10px";
-      button.style.padding = "5px 10px";
-      button.style.border = "1px solid #ccc";
-      button.style.borderRadius = "5px";
-      button.style.cursor = "pointer";
-      button.style.backgroundColor = "#57A9FB";
-      // Add any other critical styles, or import a dedicated CSS file:
-      // import './style.css'; (create this file in the same directory)
+      button.className = "setutu-save-image-button";
 
       button.addEventListener("click", async (event) => {
         if (ctx.isInvalid) {
@@ -40,6 +36,24 @@ export default defineContentScript({
         }
         event.stopPropagation();
         event.preventDefault();
+
+        try {
+          await fetch(`${apiUrl}/protected/images`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${window.localStorage.getItem(
+                "SETUTU_JWT"
+              )}`,
+            },
+            body: JSON.stringify({
+              imageUrls,
+              source: "twitter",
+            }),
+          });
+        } catch (error) {
+          alert(`Error saving image: ${(error as Error).message}`);
+        }
       });
 
       // Attempt to append to the action toolbar first
@@ -48,19 +62,19 @@ export default defineContentScript({
         'div[role="group"][id^="id__"]'
       );
       if (actionToolbar) {
-        const existingButtons = actionToolbar.querySelectorAll(
+        const existingButton = actionToolbar.querySelector(
           ".setutu-save-image-button"
         );
 
-        if (existingButtons.length < max) {
+        if (!existingButton) {
           actionToolbar.appendChild(button);
         }
       } else {
-        const existingButtons = tweetElement.querySelectorAll(
+        const existingButton = tweetElement.querySelector(
           ".setutu-save-image-button"
         );
 
-        if (existingButtons.length < max) {
+        if (!existingButton) {
           tweetElement.appendChild(button);
         }
       }
@@ -76,9 +90,11 @@ export default defineContentScript({
       );
 
       if (imageElements.length > 0) {
-        for (const imageElement of imageElements) {
-          createSaveButton(tweetNode, imageElement.src, imageElements.length);
-        }
+        const imageUrls = Array.from(imageElements).map(
+          (imageElement) => imageElement.src
+        );
+
+        createSaveButton(tweetNode, imageUrls);
       }
     };
 

@@ -1,0 +1,9 @@
+.setutu-save-image-button {
+  background-color: green;
+  color: yellow;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  margin-left: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
