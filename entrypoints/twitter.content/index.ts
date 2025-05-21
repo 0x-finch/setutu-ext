@@ -38,6 +38,10 @@ export default defineContentScript({
         event.stopPropagation();
         event.preventDefault();
 
+        button.disabled = true;
+        const originalText = button.textContent;
+        button.textContent = "Saving...";
+
         try {
           const response = await fetch(`${apiUrl}/protected/images`, {
             method: "POST",
@@ -67,6 +71,9 @@ export default defineContentScript({
           toast("Image saved successfully");
         } catch (error) {
           toast(`Error saving image: ${(error as Error).message}`);
+        } finally {
+          button.disabled = false;
+          button.textContent = originalText;
         }
       });
 
