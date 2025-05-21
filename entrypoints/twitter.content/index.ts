@@ -1,8 +1,7 @@
 import "./twitter.css";
 import { toast } from "../../libs/toast";
 
-// const apiUrl = "https://www.setutu.vip/server/v1"
-const apiUrl = "http://localhost:9000/v1";
+const API_BASE_URL = window.localStorage.getItem("SETUTU_API_BASE_URL");
 
 export default defineContentScript({
   matches: ["*://*.twitter.com/*", "*://x.com/*"],
@@ -32,9 +31,18 @@ export default defineContentScript({
 
       button.addEventListener("click", async (event) => {
         if (ctx.isInvalid) {
-          console.log("Context invalidated, button click ignored.");
+          toast("Context invalidated, button click ignored.");
           return;
         }
+
+        if (!API_BASE_URL) {
+          toast("API base URL not set. Copy one from console log.");
+          console.error(
+            "API base URL should be http://localhost:9000/v1 or https://www.setutu.vip/server/v1"
+          );
+          return;
+        }
+
         event.stopPropagation();
         event.preventDefault();
 
@@ -43,7 +51,7 @@ export default defineContentScript({
         button.textContent = "Saving...";
 
         try {
-          const response = await fetch(`${apiUrl}/protected/images`, {
+          const response = await fetch(`${API_BASE_URL}/protected/images`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
