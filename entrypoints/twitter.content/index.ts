@@ -1,4 +1,5 @@
 import "./twitter.css";
+import { toast } from "../../libs/toast";
 
 // const apiUrl = "https://www.setutu.vip/server/v1"
 const apiUrl = "http://localhost:9000/v1";
@@ -38,7 +39,7 @@ export default defineContentScript({
         event.preventDefault();
 
         try {
-          await fetch(`${apiUrl}/protected/images`, {
+          const response = await fetch(`${apiUrl}/protected/images`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -51,8 +52,21 @@ export default defineContentScript({
               source: "twitter",
             }),
           });
+
+          if (!response.ok) {
+            throw new Error("Failed to save image");
+          }
+
+          const json = await response.json();
+          const { code, data, message } = json;
+
+          if (code !== 201 || !data?.success) {
+            throw new Error(message);
+          }
+
+          toast("Image saved successfully");
         } catch (error) {
-          alert(`Error saving image: ${(error as Error).message}`);
+          toast(`Error saving image: ${(error as Error).message}`);
         }
       });
 
