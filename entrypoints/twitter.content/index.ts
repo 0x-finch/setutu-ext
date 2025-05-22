@@ -31,7 +31,7 @@ export default defineContentScript({
       button.textContent = "Save Image";
       button.className = "setutu-save-image-button";
 
-      button.addEventListener("click", async (event) => {
+      button.addEventListener("mouseenter", async (event) => {
         if (ctx.isInvalid) {
           toast("Context invalidated, button click ignored.");
           return;
