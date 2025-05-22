@@ -1,7 +1,9 @@
 import "./twitter.css";
 import { toast } from "../../libs/toast";
 
-const API_BASE_URL = window.localStorage.getItem("SETUTU_API_BASE_URL");
+const API_BASE_URL =
+  window.localStorage.getItem("SETUTU_API_BASE_URL") ||
+  "https://www.setutu.vip/server/v1";
 
 export default defineContentScript({
   matches: ["*://*.twitter.com/*", "*://x.com/*"],
