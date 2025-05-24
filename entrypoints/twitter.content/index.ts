@@ -74,22 +74,14 @@ export default defineContentScript({
           const json = (await response.json()) as {
             code: number;
             data: {
-              sttid: string;
+              success: boolean;
               url: string;
             }[];
             message: string;
           };
-          const { data } = json;
+          const { code, message } = json;
 
-          const failedImages = data.filter((image) => !image.sttid);
-          const count = failedImages.length;
-          if (count > 0) {
-            throw new Error(
-              `Failed to save ${count} image${count > 1 ? "s" : ""}`
-            );
-          } else {
-            toast("All images saved successfully");
-          }
+          toast(code === 201 ? "All images saved successfully" : message);
         } catch (error) {
           toast(`Error saving image: ${(error as Error).message}`);
         } finally {
